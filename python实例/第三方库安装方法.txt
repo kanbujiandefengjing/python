@@ -1,0 +1,3 @@
+第三方库安装失败方法：
+使用镜像：pip install xxxx -i https://pypi.douban.com/simple （豆瓣源） 
+                  或者https://pypi.tuna.tsinghua.edu.cn/simple（清华源）

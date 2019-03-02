@@ -1,3 +1,4 @@
+
 第三方库安装失败方法：
 使用镜像：pip install xxxx -i https://pypi.douban.com/simple （豆瓣源） 
                   或者https://pypi.tuna.tsinghua.edu.cn/simple（清华源）
@@ -10,3 +11,5 @@
 4.scrapy依赖lxml包，pip install lxml
  
 5.在下载存放的目录下安装pip install Twisted-17.1.0-cp36-cp36m-win_amd64.whl 或pip install scrapy
+
+pip更新：python -m pip install --upgrade pip

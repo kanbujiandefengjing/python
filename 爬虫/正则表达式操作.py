@@ -91,7 +91,13 @@ re.S  re.DOTALL        正则表达式中的.操作符能够匹配所有字符�
 >>> match=re.search(r'[1-9]\d{5}','BIT 100081')
 >>> if match:
     print(match.group(0))
-    
 100081
+
+>>>import re
+>>>content='Hellow 123456 world.'
+>>>content=re.sub('\d+',r'\1 8910',content)
+>>>print(content)
+Hello 123456 8910 world
+
 
 '''

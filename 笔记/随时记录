@@ -1,0 +1,7 @@
+查询关键字
+import keyword
+print(keyword.kwlist)
+
+内建函数
+dir(__builtins__)
+

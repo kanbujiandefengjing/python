@@ -1,0 +1,83 @@
+Python 解码与编码JSON
+JSON (JavaScript对象表示法)是一种用于表示结构化数据的流行数据格式。在服务器和web应用程序之间以JSON格式传输和接收数据是很常见的。
+在 Python中, JSON以字符串形式存在. 例如:
+p = ‘{“name”:”Bob”,”languages”:[“Python”,”Java”]}’
+在文件中存储JSON对象也很常见。
+引入json模块:import json
+在Python中解码JSON
+使用json模块解析JSON字符串和包含JSON对象的文件是很容易的。
+你可以使用json.loads()方法来解析JSON字符串，返回一个字典。
+import json
+person = ‘{“name”:”Bob”,”languages”:[“English”,”French”]}’
+person_dict = json.loads(person)
+#Output:{‘name’:’Bob’,’languages’:[‘English’,’French’]}
+print(person_dict)
+#Output:[‘English’,’French’]
+print(person_dict[‘languages’])
+这里, person 是一个JSON 字符串, person_dict 是一个字典。
+使用Python读取JSON 文件
+你可以使用json.load()方法读取一个包含JSON对象的文件。
+假设你有一个名为person.json的文件,它包含一个JSON对象。
+{“name”:”Bob”,
+“language”:[“English”,”French”]
+}
+下面是如何解析这个文件:
+import json
+with open(‘path_to_file/person.json’) as f:
+data = json.load(f)
+#output:{‘name’:’Bob’,’languages’:[‘English’,’French’]}
+print(data)
+在这里，我们使用了open()函数读取json文件。然后，使用json.load()方法解析文件，该方法会返回一个名为data的字典。
+将字典编码成JSON字符串
+你可以使用 json.dumps()方法将字典编码成JSON字符串。
+import json
+person_dict = {‘name’:’Bob’,
+‘age’:12,
+‘children’:None
+}
+person_json = json.dumps(person_dict)
+#Output:{“name”:”Bob”,”age”:12,”children”:null}
+print(person_json)
+下面的列表显示了Python对象及其与JSON的等效转换。
+python           JSON Equivalent
+dict              object
+list,tuple          array
+str               string
+int,float,int        number
+True              true
+False             false
+None             null
+将JSON 写入一个文件
+要在Python中将JSON写入文件，我们可以使用json.dump()方法。
+import json
+person_dict = {“name”:”Bob”,
+“languages”:[“English”,”French”],
+“married”:True,
+“age”:32
+}
+with open(‘person.txt’,’w’) as json_file:
+json.dump(person_dict,json_file)
+在上面的程序中，我们使用'w’在写入模式中打开了一个名为person.txt的文件。如果该文件不存在，就会创建它。然后， json.dump()将person_dict转换为一个JSON字符串，该字符串将保存在person.txt文件中。
+当你运行程序时， person.txt文件将被创建,并且包含以下文本。
+{“name”:”Bob”,”languages”:[“English”,”French”],”married”:true,”age”:32}
+使用Python 完美输出JSON
+为了分析和调试JSON数据，我们可能需要以更易于阅读的格式打印它。这可以通过向json.dumps()和json.dump()方法传递额外的参数indent和sort_keys来实现。
+例 5: 使用Python 完美输出JSON
+import json
+person_string = ‘{“name”:”Bob”,”languages”:”English”,”numbers”:[2,1.6.null]}’
+#Getting dictionary
+person_dict = json.loads(person_string)
+#Pretty Printing JSON string back
+print(json.dumps(person_dict,indent = 4,sort_keys=True))
+当你运行此程序时，输出结果将会是：
+{
+“language”:”English”,
+“name”:”Bob”,
+“numbers”:[
+    2,
+    1.6,
+    null
+]
+}
+在上面的程序中，我们使用了 4 个空格进行缩进。并且，键值是按升序排序的。
+顺便说一下，indent的默认值是None，sort_keys的默认值为False。

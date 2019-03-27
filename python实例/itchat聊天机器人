@@ -1,0 +1,48 @@
+#coding=utf8
+import requests
+import itchat
+
+KEY = '26ff7dc56499463dafbaae8f14a15a30'
+
+def get_response(msg):
+     #构造了要发送给服务器的数据
+    apiUrl = 'http://www.tuling123.com/openapi/api'
+    data = {
+        'key' : KEY,
+        'info' : msg,
+        'userid' : '大鱼',
+    }
+    try:
+        #字典的get方法在字典没有'text'值的时候会返回None而不会抛出异常
+        r = requests.post(apiUrl, data=data).json()
+        
+        return r.get('text')
+    except:
+        return
+'''
+@itchat.msg_register(itchat.content.TEXT)
+def tuling_reply(msg):
+    defaultReply = 'I received: ' + msg['Text']
+    reply = get_response(msg['Text'])
+    return reply or defaultReply
+'''
+#注册获取别人发来的信息方法
+@itchat.msg_register(['Text','Map', 'Card', 'Note', 'Sharing', 'Picture'])
+def tuling_reply(msg):
+        print(msg.User['NickName'] +":"+ msg['Text'])    #这里输出给你发微信的人的名字和他发送的内容        
+        reply = get_response(msg['Text'])         #调取图灵机器人获取回复
+        print(reply+"\n")       #打印机器人回复的消息
+        return reply
+
+@itchat.msg_register([itchat.content.TEXT], isGroupChat=True)    #群消息的处理
+def print_content(msg):
+    if msg.User["NickName"]=='斯坦福环境工程系':#or msg.User["NickName"]=='实验小分队': #这里可以在后面加更多的or msg.User["NickName"]=='你希望自动回复群的名字'
+        #print(msg.User['NickName'] +":"+ msg['Text'])     #打印哪个群给你发了什么消息
+        #print(get_response(msg['Text'])+"\n")           #打印机器人回复的消息
+        return get_response(msg['Text'])
+    else:                                         #其他群聊直接忽略
+        pass
+
+
+itchat.auto_login(hotReload=True)
+itchat.run()

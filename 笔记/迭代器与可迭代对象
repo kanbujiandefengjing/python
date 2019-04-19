@@ -1,0 +1,385 @@
+迭代器与可迭代对象
+概念
+迭代器：是访问数据集合内元素的一种方式，一般用来遍历数据，但是他不能像列表一样使用下标来获取数据，也就是说迭代器是不能返回的。
+   
+ Iterator：迭代器对象，必须要实现next魔法函数
+    Iterable：可迭代对象，继承Iterator，必须要实现iter魔法函数
+比如：
+from collections import Iterable,Iterator
+a = [1,2,3]
+print(isinstance(a,Iterator))
+print(isinstance(a,Iterable))
+返回结果：
+False
+True
+在Pycharm中使用alt+b进去list的源码中可以看到，在list类中有iter魔法函数，也就是说只要实现了iter魔法函数，那么这个对象就是可迭代对象。
+上面的例子中a是一个列表，也是一个可迭代对象，那么如何才能让这个a变成迭代器呢？使用iter()即可。
+from collections import Iterable,Iterator
+a = [1,2,3]
+a = iter(a)
+print(isinstance(a,Iterator))
+print(isinstance(a,Iterable))
+print(next(a))
+print('----')
+for x in a:
+    print(x)
+返回结果：
+True
+True
+1
+----
+2
+3
+可以看到现在a是可迭代对象又是一个迭代器，说明列表a中有iter方法，该方法返回的是迭代器，这个时候使用next就可以获取a的下一个值，但是要记住迭代器中的数值只能被获取一次。
+梳理迭代器(Iterator)与可迭代对象(Iterable)的区别：
+    可迭代对象：继承迭代器对象，可以用for循环(说明实现了iter方法)
+    迭代器对象：可以用next获取下一个值(说明实现了next方法)，但是每个值只能获取一次，单纯的迭代器没有实现iter魔法函数，所以不能使用for循环
+    只要可以用作for循环的都是可迭代对象
+    只要可以用next()函数的都是迭代器对象
+    列表,字典,字符串是可迭代对象但是不是迭代器对象，如果想变成迭代器对象可以使用iter()进行转换
+    Python的for循环本质上是使用next()进行不断调用，for循环的是可迭代对象，可迭代对象中有iter魔法函数，可迭代对象继承迭代器对象，迭代器对象中有next魔法函数
+    一般由可迭代对象变迭代器对象
+可迭代对象
+可迭代对象每次使用for循环一个数组的时候，本质上会从类中尝试调用iter魔法函数，如果类中有iter魔法函数的话，会优先调用iter魔法函数，当然这里切记iter方法必须要返回一个可以迭代的对象，不然就会报错。
+如果没有定义iter魔法函数的话，会创建一个默认的迭代器，该迭代器调用getitem魔法函数，如果你没有定义iter和getitem两个魔法函数的话，该类型就不是可迭代对象，就会报错。
+比如：
+class s:
+    def __init__(self,x):
+        self.x = x
+    def __iter__(self):
+        return iter(self.x)
+        # 这里必须要返回一个可以迭代的对象
+    # def __getitem__(self, item):
+    #     return self.x[item]
+# iter和getitem其中必须要实现一个
+a = s('123')
+# 这里的a就是可迭代对象
+# 这里不能调用next(a)方法，因为没有定义
+for x in a:
+    print(x)
+这里把注释符去掉返回结果也是一样的，返回结果：
+1
+2
+3
+迭代器对象
+一开始提起，iter搭配Iterable做可迭代对象，next搭配Iterator做迭代器。next()接受一个迭代器对象，作用是获取迭代器对象的下一个值，迭代器是用来做迭代的，只会在需要的时候产生数据。
+和可迭代对象不同，可迭代对象一开始是把所有的列表放在一个变量中，然后用getitem方法不断的返回数值，getitem中的item就是索引值。
+但是next方法并没有索引值，所以需要自己维护一个索引值，方便获取下一个变量的位置。
+class s:
+    def __init__(self,x):
+        self.x = x
+        # 获取传入的对象
+        self.index = 0
+        # 维护索引值
+    def __next__(self):
+        try:
+            result = self.x[self.index]
+            # 获取传入对象的值
+        except IndexError:
+            # 如果索引值错误
+            raise StopIteration
+        # 抛出停止迭代
+        self.index += 1
+        # 索引值+1，用来获取传入对象的下一个值
+        return result
+        # 返回传入对象的值
+
+a = s([1,2,3])
+print(next(a))
+print('----------')
+for x in a:
+# 类中并没有iter或者getitem魔法函数，不能用for循环，会报错
+    print(x)
+返回结果：
+Traceback (most recent call last):
+1
+----------
+  File "C:/CODE/Python进阶知识/迭代协议/迭代器.py", line 34, in <module>
+    for x in a:
+TypeError: 's' object is not iterable
+上面一个就是完整的迭代器对象，他是根据自身的索引值来获取传入对象的下一个值，并不是像可迭代对象直接把传入对象读取到内存中，所以对于一些很大的文件读取的时候，可以一行一行的读取内容，而不是把文件的所有内容读取到内存中。
+这个类是迭代器对象，那么如何才能让他能够使用for循环呢？那就让他变成可迭代对象，只需要在类中加上iter魔法函数即可。
+class s:
+    def __init__(self,x):
+        self.x = x
+        # 获取传入的对象
+        self.index = 0
+        # 维护索引值
+    def __next__(self):
+        try:
+            result = self.x[self.index]
+            # 获取传入对象的值
+        except IndexError:
+            # 如果索引值错误
+            raise StopIteration
+        # 抛出停止迭代
+        self.index += 1
+        # 索引值+1，用来获取传入对象的下一个值
+        return result
+        # 返回传入对象的值
+    def __iter__(self):
+        return self
+a = s([1,2,3])
+print(next(a))
+print('----------')
+for x in a:
+    print(x)
+返回结果：
+1
+----------
+2
+3
+可以看到这个时候运行成功，但是这个对象还是属于迭代器对象，因为在next获取下一个值会报错。
+知识整理
+根据上面的代码提示，得到规律：
+    iter让类变成可迭代对象，next让类变成迭代器(要维护索引值)。
+    可迭代对象可以用for循环，迭代器可以用next获取下一个值。
+    迭代器如果想要变成可迭代对象用for循环，就要在迭代器内部加上iter魔法函数
+    可迭代对象如果想要能用next魔法函数，使用自身类中的iter()方法即可变成迭代器对象
+class s:
+    def __init__(self,x):
+        self.x = x
+        self.index = 0
+    def __next__(self):
+        try:
+            result = self.x[self.index]
+        except IndexError:
+            raise StopIteration
+        self.index += 1
+        return result
+
+class b:
+    def __init__(self,x):
+        self.x = x
+    def __iter__(self):
+        return s(self.x)
+a = b([1,2,3])
+
+for x in a:
+    print(x)
+返回结果：
+1
+2
+3
+这个时候是不能再用next方法了，应为类b是一个可迭代对象，并非迭代器，这个时候不能用next方法，但是可以让类b继承类s，这样就能用next()方法获取下一个值，但是你的类b中要存在索引值，不然会报错，如下代码:
+class s:
+    def __init__(self,x):
+        self.x = x
+        # 获取传入的对象
+        self.index = 0
+        # 维护索引值
+    def __next__(self):
+        try:
+            result = self.x[self.index]
+            # 获取传入对象的值
+        except IndexError:
+            # 如果索引值错误
+            raise StopIteration
+        # 抛出停止迭代
+        self.index += 1
+        # 索引值+1，用来获取传入对象的下一个值
+        return result
+        # 返回传入对象的值
+    # def __iter__(self):
+    #     return self
+class b(s):
+    def __init__(self,x):
+        self.x = x
+        self.index = 0
+    def __iter__(self):
+        return s(self.x)
+a = b([1,2,3])
+print(next(a))
+print(next(a))
+返回结果：
+1
+2
+可以这么做，但是没必要，因为这样违反了设计原则。
+迭代器的设计模式
+迭代器模式：提供一种方法顺序访问一个聚合对象中的各种元素，而又不暴露该对象的内部
+表示。
+迭代器的设计模式是一种经典的设计模式，根据迭代器的特性(根据索引值读取下一个内容，不一次性读取大量数据到内存)不建议将next和iter都写在一个类中去实现。
+新建一个迭代器，用迭代器维护索引值，返回根据索引值获取对象的数值，新建另一个可迭代对象，使用iter方法方便的循环迭代器的返回值。
+生成器
+生成器：函数中只要有yield，这个函数就会变成生成器。每次运行到yield的时候，函数会暂停，并且保存当前的运行状态，返回返回当前的数值，并在下一次执行next方法的时候，又从当前位置继续往下走。
+简单用法
+举个例子：
+
+def gen():
+    yield 1
+    # 返回一个对象，这个对象的值是1
+def ret():
+    return 1
+    # 返回一个数字1
+g = gen()
+r = ret()
+print(g,r)
+print(next(g))
+
+返回结果：
+<generator object gen at 0x000001487FDA2D58> 1
+1
+
+可以看到return是直接返回数值1，yield是返回的一个生成器对象，这个对象的值是1，使用next(g)或者for x in g:print x 都是可以获取到他的内容的，这个对象是在python编译字节码的时候就产生。
+def gen():
+    yield 1
+    yield 11
+    yield 111
+    yield 1111
+    yield 11111
+    yield 111111
+    # 返回一个对象，这个对象内的值是1和11,111...
+def ret():
+    return 1
+    return 3
+    # 第二个return是无效的
+g = gen()
+r = ret()
+print(g,r)
+print(next(g))
+for x in g:
+    print(x)
+
+返回结果：
+<generator object gen at 0x000002885FE32D58> 1
+1
+11
+111
+1111
+11111
+111111
+就像迭代器的特性一样，获取过一遍的值是没法再获取一次的，并且不是那种一次把所有的结果求出放在内存或者说不是一次性读取所有的内容放在内存中。
+梳理特性：
+
+    使用yield的函数都是生成器函数
+可以使用for循环获取值，也可以使用next获取生成器函数的值
+
+原理
+函数工作原理：函数的调用满足“后进先出”的原则，也就是说，最后被调用的函数应该第一个返回，函数的递归调用就是一个经典的例子。显然，内存中以“后进先出”方式处理数据的栈段是最适合用于实现函数调用的载体，在编译型程序语言中，函数被调用后，函数的参数，返回地址，寄存器值等数据会被压入栈，待函数体执行完毕，将上述数据弹出栈。这也意味着，一个被调用的函数一旦执行完毕，它的生命周期就结束了。
+python解释器运行的时候，会用C语言当中的PyEval_EvalFramEx函数创建一个栈帧，所有的栈帧都是分配再堆内存上，如果不主动释放就会一直在里面。
+Python 的堆栈帧是分配在堆内存中的，理解这一点非常重要！Python 解释器是个普通的 C 程序，所以它的堆栈帧就是普通的堆栈。但是它操作的 Python 堆栈帧是在堆上的。除了其他惊喜之外，这意味着 Python 的堆栈帧可以在它的调用之外存活。(FIXME: 可以在它调用结束后存活)，这个就是生成器的核心原理实现。
+Python脚本都会被python.exe编译成字节码的形式，然后python.exe再执行这些字节码，使用dis即可查看函数对象的字节码对象。
+import dis
+# 查看函数程序字节码
+a = 'langzi'
+print(dis.dis(a))
+print('-'*20)
+def sb(admin):
+    print(admin)
+print(dis.dis(sb))
+
+返回结果：
+  1           0 LOAD_NAME                0 (langzi)
+# 加载名字 为langzi
+              2 RETURN_VALUE
+# 返回值
+None
+--------------------
+ 15           0 LOAD_GLOBAL              0 (print)
+# 加载一个print函数
+              2 LOAD_FAST                0 (admin)
+# 加载传递参数为admin
+              4 CALL_FUNCTION            1
+# 调用这个函数
+              6 POP_TOP
+# 从栈的顶端把元素移除出来
+              8 LOAD_CONST               0 (None)
+# 因为该函数没有返回任何值，所以加载的值是none
+             10 RETURN_VALUE
+# 最后把load_const的值返回(个人理解)
+None
+代码函数运行的时候，python将代码编译成字节码，当函数存在yield的时候，python会将这个函数标记成生成器，当调用这个函数的时候，会返回生成器对象，调用这个生成器对象后C语言中写的函数会记录上次代码执行到的位置和变量。
+在C语言中的PyGenObject中有两个值，gi_frame(存储上次代码执行到的位置f_lasti的上次代码执行到的变量f_locals),gi_code(存储代码)，使用dis也可以获取到上次代码执行的位置和值。
+举个例子：
+import dis
+def gen():
+    yield 1
+    yield 2
+    return 666
+g = gen()
+# g是生成器对象
+print(dis.dis(g))
+print('*'*10)
+print(g.gi_frame.f_lasti)
+# 这里还没有执行，返回的位置是-1
+print(g.gi_frame.f_locals)
+# 这里还没有执行，返回的对象是{}
+next(g)
+print('*'*10)
+print(g.gi_frame.f_lasti)
+print(g.gi_frame.f_locals)
+
+返回结果：
+ 11           0 LOAD_CONST               1 (1)
+# 加载值为1
+              2 YIELD_VALUE
+              4 POP_TOP
+
+ 12           6 LOAD_CONST               2 (2)
+              8 YIELD_VALUE
+             10 POP_TOP
+
+ 13          12 LOAD_CONST               3 (666)
+             14 RETURN_VALUE
+None
+**********
+-1
+# 因为还没有执行，所以获取的行数为 -1
+{}
+**********
+2
+# 这里开始执行了第一次，获取的行数是2，2对应2 YIELD_VALUE就是前面加载的数值1
+{}
+# g.gi_frame.f_locals 是局部变量，你都没定义那么获取的结果自然是{}，你只需在代码中加上user='admin'，这里的{}就会改变。
+生成器可以在任何时候被任何函数恢复执行，因为它的栈帧实际上不在栈上而是在堆上。生成器在调用调用层次结构中的位置不是固定的，也不需要遵循常规函数执行时遵循的先进后出顺序。因为这些特性，生成器不仅能用于生成可迭代对象，还可以用于实现多任务协作。
+就是说只要拿到了这个生成器对象，就能对这个生成器对象进行控制，比如继续执行暂停等待，这个就是协程能够执行的理论原理。
+应用场景
+读取文件，使用open(‘xxx’).read(2019)//打开一个文件，每次读取2019个偏移量。文件a.txt是一行文字，但是特别长，这一行文字根据|符号分开，如何读取？
+
+写入文件代码：
+# -*- coding:utf-8 -*-
+import random
+import threading
+import string
+import time
+t1 = time.time()
+def write(x):
+    with open('a.txt','a+')as a:
+        a.write(x + '||')
+
+def run():
+    for x in range(10000000):
+        strs = str(random.randint(1000,2000)) +random.choice(string.ascii_letters)*10
+        write(strs)
+for x in range(10):
+    t = threading.Thread(target=run)
+    t.start()
+t2 = time.time()
+print(t2 - t1)
+
+读取文件代码：
+# -*- coding:utf-8 -*-
+def readbooks(f, newline):
+    # f为传入的文件名，newline为分隔符
+    buf = ""
+    # 缓存，处理已经读出来的数据量
+    while 1:
+        while newline in buf:
+            # 缓存中的数据是否存在分隔符
+            pos = buf.index(newline)
+            # 如果存在就找到字符的位置,比如0或者1或者2
+            yield buf[:pos]
+            # 暂停函数，返回缓存中的从头到字符的位置
+            buf = buf[pos + len(newline):]
+            # 缓存变成了，字符的位置到末尾
+        chunk = f.read(2010 * 10)
+        # 读取2010*10的字符
+        if not chunk:
+            # 已经读取到了文件结尾
+            yield buf
+            break
+        buf += chunk
+        # 加到缓存
+ with open('a.txt','r')as f:
+     for line in readbooks(f,'||'):
+         print(line)

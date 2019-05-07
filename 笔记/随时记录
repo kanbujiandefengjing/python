@@ -5,3 +5,9 @@ print(keyword.kwlist)
 内建函数
 dir(__builtins__)
 
+中文输出排版：
+def printUnivList(ulist, num):
+    tplt = "{0:^10}\t{1:{3}^10}\t{2:^10}"  #{3}
+    print(tplt.format("排名","学校名称","总分",chr(12288))) #chr(12288)为中文填充空格，代码见 中国最好大学排名.py
+    
+ 

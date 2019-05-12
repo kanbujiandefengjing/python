@@ -99,5 +99,12 @@ re.S  re.DOTALL        正则表达式中的.操作符能够匹配所有字符�
 >>> print(content)
 Hello 123456 8910 world
 
+re.compile(pattern,flags=0)
+将正则表达式的字符串形式编译成正则表达式对象
 
+示例：
+>>>regex=re.compile(r'[1-9]\d{5}')  #regex为正则表达式re
+>>>reg=regex.search('BIT 100081')
+>>>print(reg.group(0))
+100081
 '''

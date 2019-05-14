@@ -108,3 +108,5 @@ re.compile(pattern,flags=0)
 >>>print(reg.group(0))
 100081
 '''
+
+match 对象

@@ -109,4 +109,33 @@ re.compile(pattern,flags=0)
 100081
 '''
 
-match 对象
+match 对象 
+属性：
+.string    带匹配的文本
+.re        匹配时使用的pattren对象（正则表达式）
+.pos       正则表达式搜索文本的开始位置
+.endpos    正则表达式搜索文本的结束位置
+方法：
+.group(0)  获得匹配后的字符串  #group(1)，group(2)...
+.start()   匹配字符串在原始字符串的开始位置
+.end()     匹配字符串在原始字符串的结束位置
+.span()    返回(.start(),.end())
+示例：
+>>>import re
+>>>m=re.search(r'[1-9]\d{5}','BIT100081 TSU100084')
+>>>m.string
+'BIT100081 TSU100084'
+>>> m.re
+re.compile('[1-9]\\d{5}')
+>>> m.pos
+0
+>>> m.endpos
+19
+>>> m.group(0)
+'100081'
+>>> m.start()
+3
+>>> m.end()
+9
+>>> m.span()
+(3, 9)

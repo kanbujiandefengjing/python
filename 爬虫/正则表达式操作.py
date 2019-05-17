@@ -99,6 +99,7 @@ re.S  re.DOTALL        正则表达式中的.操作符能够匹配所有字符�
 >>> print(content)
 Hello 123456 8910 world
 
+另一种方式：
 re.compile(pattern,flags=0)
 将正则表达式的字符串形式编译成正则表达式对象
 
@@ -139,3 +140,18 @@ re.compile('[1-9]\\d{5}')
 9
 >>> m.span()
 (3, 9)
+
+
+re库默认#贪婪匹配
+>>>match = re.search(r'PY.*N','PYANBNCNDN')
+>>>match.group(0)
+'PYANBNCNDN'
+#最小匹配
+>>>match = re.search(r'PY.*?N','PYANBNCNDN')
+>>>match.group(0)
+'PYAN'
+最小匹配操作符
+*？ 前一个字符0次或无限次扩展，最小匹配
++？ 前一个字符1次或无限次扩展，最小匹配
+？？ 前一个字符0次或1次扩展，最小匹配
+{m,n}? 扩展前一个字符m至n次（含n），最小匹配

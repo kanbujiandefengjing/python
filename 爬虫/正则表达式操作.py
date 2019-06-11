@@ -155,3 +155,25 @@ re库默认#贪婪匹配
 +？ 前一个字符1次或无限次扩展，最小匹配
 ？？ 前一个字符0次或1次扩展，最小匹配
 {m,n}? 扩展前一个字符m至n次（含n），最小匹配
+
+
+BeautifulSoup中可以通过name和attrs去定位名称和属性，以找到特定的html代码。
+如：
+<div class="cool">
+    <h1 class="abc">design</h1>
+</div>
+
+搜索此行：
+abcSoup = soup.find(name="h1", attrs={"class":"abc"})
+
+attrs支持正则表达式
+<div class="cool">
+    <h1 class="abc">design</h1>
+    <h1 class="abc test1">design photo</h1>
+    <h1 class="abc test2">design product</h1>
+</div>
+
+此时，想一次性找到三个h1，就需要用到正则了。
+abcSouplist = soup.find_all(name="h1", attrs={"class":re.compile(r"abc(\s\w+)?")})
+
+
